@@ -98,9 +98,10 @@ public class DanceFloor
     
     public void ChangeFloor(int[] indices)
     {
+        Color c = _hitObjectManager.ColorManager.CurrentColor();
         foreach (int index in indices)
         {
-            _squares[index].RandomHue();
+            _squares[index].SetColor(c);
         }
     }
 }

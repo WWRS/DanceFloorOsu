@@ -7,10 +7,12 @@ public class HitObjectManager
 {
     private readonly Queue<HitObject> _objects;
     private HitObject _lastObject;
+    public ColorManager ColorManager;
 
     public HitObjectManager(Beatmap beatmap)
     {
         _objects = new Queue<HitObject>(beatmap.HitObjects);
+        ColorManager = new ColorManager(beatmap);
     }
 
     public void UpdateObjects(Action<HitObject, float> callback, float audioTime)
@@ -23,6 +25,10 @@ public class HitObjectManager
         while (ShouldAdvance(audioTime))
         {
             HitObject nextObject = _objects.Dequeue();
+            if (nextObject.IsNewCombo)
+            {
+                ColorManager.Advance(nextObject.ComboOffset);
+            }
 
             float speed = HitObjectUtils.Speed(_lastObject, nextObject);
             callback.Invoke(nextObject, speed);
@@ -46,7 +52,7 @@ public class HitObjectManager
 
     public int NextGap()
     {
-        if (_objects.Count > 0)
+        if (_lastObject != null && _objects.Count > 0)
         {
             return HitObjectUtils.TimeGap(_lastObject, _objects.Peek());
         }

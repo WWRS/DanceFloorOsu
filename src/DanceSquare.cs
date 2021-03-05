@@ -26,11 +26,19 @@ public class DanceSquare
     public void RandomHue()
     {
         Hue = Random.value;
-        Sat -= 0.2f;
+        Sat -= 0.3f;
+    }
+    
+    public void SetColor(Color c)
+    {
+        float cHue, cSat, cVal;
+        Color.RGBToHSV(c, out cHue, out cSat, out cVal);
+        Hue = cHue;
+        Sat -= 0.3f;
     }
 
     public Color GetColor()
     {
-        return Color.HSVToRGB(Hue, Sat, 0.9f);
+        return Color.HSVToRGB(Hue, Sat, 0.8f);
     }
 }

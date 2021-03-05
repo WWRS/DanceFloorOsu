@@ -49,7 +49,8 @@ public static class FloorUtils
             float beats = HitObjectUtils.Length(obj) / beatLength;
             float ms = Mathf.Ceil(beats) * beatLength;
             float len = ms / 1000f;
-            float patternLen = beatLength / (beats % 2 == 0 ? 500f : 1000f);
+            //float patternLen = beatLength / (beats % 2 == 0 ? 500f : 1000f);
+            float patternLen = beatLength / 500f;
             for (float f = 0; f < len - 0.002f; f += patternLen)
             {
                 FullPattern(floor, patternLen, f, ReversePattern);

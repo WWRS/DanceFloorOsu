@@ -96,7 +96,7 @@ namespace DanceFloorOsu
             else
             {
                 int ct = (int) Mathf.Clamp(speed * 25, 10, 100);
-                int[] changes = Patterns.Random(ct);
+                int[] changes = Patterns.SmartRandom(ct, _squares);
                 ChangeFloor(changes);
             }
         }

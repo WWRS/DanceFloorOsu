@@ -26,6 +26,24 @@ namespace DanceFloorOsu
             return output.ToArray();
         }
 
+        public static int[] SmartRandom(int num, DanceSquare[] squares)
+        {
+            if (num < 0)
+            {
+                return new int[] { };
+            }
+
+            if (num >= 100)
+            {
+                return Utils.ArrayRange(100);
+            }
+
+            List<int> indices = Utils.ArrayRange(100).ToList();
+            Utils.Shuffle(indices);
+            indices.Sort((a, b) => (squares[a].TimeSet < squares[b].TimeSet ? -1 : 1));
+            return indices.Take(num).ToArray();
+        }
+
         public static int[] FullHoriz1(int time)
         {
             int[] output = new int[10];

@@ -29,8 +29,9 @@ namespace DanceFloorOsu
 
         public void RandomHue()
         {
+            TimeSet = Time.time;
             Hue = Random.value;
-            Sat -= 0.3f;
+            Sat = Mathf.MoveTowards(Sat, 0, 0.3f);
         }
 
         public void SetSat(float x)
@@ -47,10 +48,11 @@ namespace DanceFloorOsu
 
         public void SetColor(Color c)
         {
+            TimeSet = Time.time;
             float cHue, cSat, cVal;
             Color.RGBToHSV(c, out cHue, out cSat, out cVal);
             Hue = cHue;
-            Sat -= 0.3f;
+            Sat = Mathf.MoveTowards(Sat, 0, 0.3f);
         }
 
         public Color GetColor()

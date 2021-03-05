@@ -1,32 +1,35 @@
 using System.Numerics;
 using OsuParsers.Beatmaps.Objects;
 
-public static class HitObjectUtils
+namespace DanceFloorOsu
 {
-    public static float Distance(HitObject first, HitObject second)
+    public static class HitObjectUtils
     {
-        return Vector2.Distance(first.Position, second.Position);
-    }
-    
-    public static int TimeGap(HitObject first, HitObject second)
-    {
-        return  second.StartTime - first.EndTime;
-    }
-
-    public static int Length(HitObject obj)
-    {
-        return obj.EndTime - obj.StartTime;
-    }
-
-    public static float Speed(HitObject first, HitObject second)
-    {
-        if (first != null && second != null)
+        public static float Distance(HitObject first, HitObject second)
         {
-            return Distance(first, second) / TimeGap(first, second);
+            return Vector2.Distance(first.Position, second.Position);
         }
-        else
+
+        public static int TimeGap(HitObject first, HitObject second)
         {
-            return 0.5f;
+            return second.StartTime - first.EndTime;
+        }
+
+        public static int Length(HitObject obj)
+        {
+            return obj.EndTime - obj.StartTime;
+        }
+
+        public static float Speed(HitObject first, HitObject second)
+        {
+            if (first != null && second != null)
+            {
+                return Distance(first, second) / TimeGap(first, second);
+            }
+            else
+            {
+                return 0.5f;
+            }
         }
     }
 }

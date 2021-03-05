@@ -2,106 +2,112 @@ using UnityEngine;
 using OsuParsers.Beatmaps;
 using OsuParsers.Beatmaps.Objects;
 
-public class DanceFloor
+namespace DanceFloorOsu
 {
-    private readonly AudioSource _musicSource;
-
-    private TimingManager _timingManager;
-    private HitObjectManager _hitObjectManager;
-
-    private readonly DanceSquare[] _squares = new DanceSquare[100];
-
-    public DanceFloor(AudioSource musicSource)
+    public class DanceFloor
     {
-        _musicSource = musicSource;
+        private readonly AudioSource _musicSource;
 
-        DanceFloorUpdater.Init();
+        private TimingManager _timingManager;
+        private HitObjectManager _hitObjectManager;
 
-        for (int i = 0; i < 10; i++)
+        private readonly DanceSquare[] _squares = new DanceSquare[100];
+
+        public DanceFloor(AudioSource musicSource)
         {
-            for (int j = 0; j < 10; j++)
+            _musicSource = musicSource;
+
+            DanceFloorUpdater.Init();
+
+            for (int i = 0; i < 10; i++)
             {
-                _squares[10 * i + j] = new DanceSquare(i, j);
-            }
-        }
-    }
-
-    public void Load(Beatmap beatmap)
-    {
-        _timingManager = new TimingManager(beatmap);
-        _hitObjectManager = new HitObjectManager(beatmap);
-    }
-
-    public void Update()
-    {
-        int audioTime = Mathf.RoundToInt(_musicSource.time * 1000);
-        _timingManager?.UpdateTiming(audioTime);
-        _hitObjectManager?.UpdateObjects(ObjectResponse, audioTime);
-        UpdateSquares();
-    }
-
-    public Color[,] ColorGrid()
-    {
-        Color[,] output = new Color[10, 10];
-        
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                output[i, j] = _squares[i * 10 + j].GetColor();
+                for (int j = 0; j < 10; j++)
+                {
+                    _squares[10 * i + j] = new DanceSquare(i, j);
+                }
             }
         }
 
-        return output;
-    }
-
-    public Color[] ColorArray()
-    {
-        Color[] output = new Color[100];
-
-        for (int i = 0; i < 100; i++)
+        public void Load(Beatmap beatmap)
         {
-            output[i] = _squares[i].GetColor();
+            _timingManager = new TimingManager(beatmap);
+            _hitObjectManager = new HitObjectManager(beatmap);
         }
 
-        return output;
-    }
+        public void Update()
+        {
+            int audioTime = Mathf.RoundToInt(_musicSource.time * 1000);
+            _timingManager?.UpdateTiming(audioTime);
+            _hitObjectManager?.UpdateObjects(ObjectResponse, audioTime);
+            UpdateSquares();
+        }
 
-    private void UpdateSquares()
-    {
-        foreach (DanceSquare square in _squares)
+        public Color[,] ColorGrid()
         {
-            square.Update();
-        }
-    }
+            Color[,] output = new Color[10, 10];
 
-    public void ObjectResponse(HitObject nextObject, float speed)
-    {
-        float beatLength = _timingManager.BeatLength();
-        
-        if (HitObjectUtils.Length(nextObject) >= beatLength / 2 - 0.002f)
-        {
-            FloorUtils.SmartPattern(this, nextObject, beatLength);
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    output[i, j] = _squares[i * 10 + j].GetColor();
+                }
+            }
+
+            return output;
         }
-        else if (_hitObjectManager.NextGap() >= beatLength * 3 - 0.002f)
+
+        public Color[] ColorArray()
         {
-            FloorUtils.PlayPattern(this, Patterns.Droplet, 15, beatLength / 500f, 0,
-                a => { foreach(int t in a) _squares[t].Sat = 0; });
+            Color[] output = new Color[100];
+
+            for (int i = 0; i < 100; i++)
+            {
+                output[i] = _squares[i].GetColor();
+            }
+
+            return output;
         }
-        else
+
+        private void UpdateSquares()
         {
-            int ct = (int) Mathf.Clamp(speed * 25, 10, 100);
-            int[] changes = Patterns.Random(ct);
-            ChangeFloor(changes);
+            foreach (DanceSquare square in _squares)
+            {
+                square.Update();
+            }
         }
-    }
-    
-    public void ChangeFloor(int[] indices)
-    {
-        Color c = _hitObjectManager.ColorManager.CurrentColor();
-        foreach (int index in indices)
+
+        public void ObjectResponse(HitObject nextObject, float speed)
         {
-            _squares[index].SetColor(c);
+            float beatLength = _timingManager.BeatLength();
+
+            if (HitObjectUtils.Length(nextObject) >= beatLength / 2 - 0.002f)
+            {
+                FloorUtils.SmartPattern(this, nextObject, beatLength);
+            }
+            else if (_hitObjectManager.NextGap() >= beatLength * 3 - 0.002f)
+            {
+                FloorUtils.PlayPattern(this, Patterns.Droplet, 15, beatLength / 500f, 0,
+                    a =>
+                    {
+                        foreach (int t in a) _squares[t].SetSat(0);
+                    });
+            }
+            else
+            {
+                int ct = (int) Mathf.Clamp(speed * 25, 10, 100);
+                int[] changes = Patterns.Random(ct);
+                ChangeFloor(changes);
+            }
+        }
+
+        public void ChangeFloor(int[] indices)
+        {
+            Color c = _hitObjectManager.ColorManager.CurrentColor();
+            foreach (int index in indices)
+            {
+                _squares[index].SetColor(c);
+            }
         }
     }
 }

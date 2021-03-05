@@ -3,62 +3,66 @@ using System.Collections.Generic;
 using OsuParsers.Beatmaps;
 using OsuParsers.Beatmaps.Objects;
 
-public class HitObjectManager
+namespace DanceFloorOsu
 {
-    private readonly Queue<HitObject> _objects;
-    private HitObject _lastObject;
-    public ColorManager ColorManager;
-
-    public HitObjectManager(Beatmap beatmap)
+    public class HitObjectManager
     {
-        _objects = new Queue<HitObject>(beatmap.HitObjects);
-        ColorManager = new ColorManager(beatmap);
-    }
+        public readonly ColorManager ColorManager;
 
-    public void UpdateObjects(Action<HitObject, float> callback, float audioTime)
-    {
-        if (_objects == null || _objects.Count == 0)
+        private readonly Queue<HitObject> _objects;
+        private HitObject _lastObject;
+
+        public HitObjectManager(Beatmap beatmap)
         {
-            return;
+            _objects = new Queue<HitObject>(beatmap.HitObjects);
+            ColorManager = new ColorManager(beatmap);
         }
 
-        while (ShouldAdvance(audioTime))
+        public void UpdateObjects(Action<HitObject, float> callback, float audioTime)
         {
-            HitObject nextObject = _objects.Dequeue();
-            if (nextObject.IsNewCombo)
+            if (_objects == null || _objects.Count == 0)
             {
-                ColorManager.Advance(nextObject.ComboOffset);
+                return;
             }
 
-            float speed = HitObjectUtils.Speed(_lastObject, nextObject);
-            callback.Invoke(nextObject, speed);
+            while (ShouldAdvance(audioTime))
+            {
+                HitObject nextObject = _objects.Dequeue();
+                if (nextObject.IsNewCombo)
+                {
+                    ColorManager.Advance(nextObject.ComboOffset);
+                }
 
-            _lastObject = nextObject;
+                float speed = HitObjectUtils.Speed(_lastObject, nextObject);
+                callback.Invoke(nextObject, speed);
+
+                _lastObject = nextObject;
+            }
         }
-    }
 
 
-    private bool ShouldAdvance(float audioTime)
-    {
-        if (_objects == null || _objects.Count == 0)
+        private bool ShouldAdvance(float audioTime)
         {
-            return false;
+            if (_objects == null || _objects.Count == 0)
+            {
+                return false;
+            }
+
+            HitObject nextObject = _objects.Peek();
+
+            return (nextObject.StartTime <= audioTime);
         }
 
-        HitObject nextObject = _objects.Peek();
-
-        return (nextObject.StartTime <= audioTime);
-    }
-
-    public int NextGap()
-    {
-        if (_lastObject != null && _objects.Count > 0)
+        public int NextGap()
         {
-            return HitObjectUtils.TimeGap(_lastObject, _objects.Peek());
-        }
-        else
-        {
-            return -1;
+            if (_lastObject != null && _objects.Count > 0)
+            {
+                return HitObjectUtils.TimeGap(_lastObject, _objects.Peek());
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }

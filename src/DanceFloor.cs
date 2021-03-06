@@ -90,7 +90,11 @@ namespace DanceFloorOsu
                 FloorUtils.PlayPattern(this, Patterns.Droplet, 15, beatLength / 500f, 0,
                     a =>
                     {
-                        foreach (int t in a) _squares[t].SetSat(0);
+                        foreach (int t in a)
+                        {
+                            _squares[t].SetSat(0);
+                            _squares[t].ValMode = true;
+                        }
                     });
             }
             else

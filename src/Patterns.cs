@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,10 +39,37 @@ namespace DanceFloorOsu
                 return Utils.ArrayRange(100);
             }
 
-            List<int> indices = Utils.ArrayRange(100).ToList();
-            Utils.Shuffle(indices);
-            indices.Sort((a, b) => (squares[a].TimeSet < squares[b].TimeSet ? -1 : 1));
-            return indices.Take(num).ToArray();
+            //List<int> indices = Utils.ArrayRange(100).ToList();
+            //Utils.Shuffle(indices);
+            //indices.Sort((a, b) => (squares[a].TimeSet < squares[b].TimeSet ? -1 : 1));
+            //return indices.Take(num).ToArray();
+
+            float time = UnityEngine.Time.time;
+            float minDt = 100;
+            float maxDt = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                if (time - squares[i].TimeSet < minDt)
+                {
+                    minDt = time - squares[i].TimeSet;
+                }
+                if (time - squares[i].TimeSet > maxDt)
+                {
+                    maxDt = time - squares[i].TimeSet;
+                }
+            }
+
+            List<int> output = new List<int>();
+            for (int i = 0; i < 100; i++)
+            {
+                float val = (time - squares[i].TimeSet - minDt) / (maxDt - minDt);
+                if (UnityEngine.Random.Range(0, 2f) < (num / 100f) + val)
+                {
+                    output.Add(i);
+                }
+            }
+
+            return output.ToArray();
         }
 
         public static int[] FullHoriz1(int time)
